@@ -1,0 +1,5 @@
+config/sfPropelNotificationPlugin/backends.yml:
+  class: sfPropelNotificationPluginBackendsConfigurationHandler
+  
+config/sfPropelNotificationPlugin/types.yml:
+  class: sfPropelNotificationPluginTypesConfigurationHandler

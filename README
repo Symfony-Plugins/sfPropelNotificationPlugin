@@ -1,0 +1,277 @@
+= sfPropelNotificationPlugin plugin =
+
+The `sfPropelNotificationPlugin` is a lightweight, resource-oriented notification framework.
+
+== Features ==
+
+ * Support for any notification backend (standard distribution comes with an email notification backend)
+ * Completely abstracted notification logic
+ * Support for multiple users subscribed to different notification types using multiple notification backends
+ * Provides a module for users to manage their subscriptions
+
+== Installation ==
+
+=== Install the plugin ===
+  
+{{{
+#!sh
+symfony plugin-install http://plugins.symfony-project.com/sfPropelNotificationPlugin
+}}}
+
+=== Set up relationship with your model's user table ===
+
+ * Update plugin's `schema.xml` : replace `@FIXME@` occurences in the `watch` table with correct values. Eg. :
+ 
+{{{
+#!xml
+<?xml version="1.0" encoding="UTF-8"?>
+<table name="watch">
+  <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+  <column name="user_id" type="INTEGER" required="true" />
+  <column name="watch_type" type="VARCHAR" size="255" required="true" />
+  <index name="watch_FKIndex2">
+    <index-column name="user_id" />
+  </index>
+  <foreign-key foreignTable="User" name="Rel_02" onDelete="">
+    <reference local="user_id" foreign="id" />
+  </foreign-key>
+</table>
+}}}
+
+ * Register connected user peer class and unique id in session, under the `sfPropelNotificationPlugin` namespace :
+
+For instance, when logging user in :
+
+{{{
+#!php
+<?php
+$this->getUser()->setAttribute('uid', $id, 'sfPropelNotificationPlugin');
+$this->getUser()->setAttribute('peer_class', 'UserPeer', 'sfPropelNotificationPlugin');
+}}}
+
+== Usage ==
+
+=== Defining notification types ===
+
+This plugin enable users to subscribe to notification "types". Let's see how to define a notification type which will trigger notification
+when an (imaginary) article is reported being offensive by five users or more : 
+
+ * Create a `sfPropelNotificationPlugin` directory in your application's `config` directory
+ * Create a `types.yml` file in this directory
+ * Specify a new notification type :
+{{{
+offensive_article:
+  enabled: on
+  logic_class: myLogicProvider
+}}}
+
+The `myLogicProvider` class implements the logic that will tell if notification logic should be triggered :
+{{{
+#!php
+<?php
+class myLogicProvider
+{
+  public static function OffensiveArticle(Article $article)
+  {
+    return $article->countOffensiveReports() >= 5;
+  }
+}
+}}}
+
+ * Register notification behavior with your `Article` class :
+
+{{{
+#!php
+<?php
+// lib/model/Article.php
+class Article extends BaseArticle
+{
+  // ...
+}
+
+sfPropelBehavior::add('Article', array('sfPropelNotificationPlugin' =>  array('types' => array('offensive_article')));
+}}}
+
+And that's it. Every time an article is modified, it will be checked against every notification type it's registered with.
+If type's associated logic method returns true, notification will be triggered for every user who subscribed to it, using whatever notification
+backend(s) they chose.
+
+=== Enabling the notification management module ===
+
+This module provides a `my` action, which is a way for registered user to manage their subscriptions to notifications types and backends.
+
+''insert screenshot here''
+
+Enable it in your application's `settings.yml` :
+
+{{{
+all:
+  .settings:  
+    enabled_modules: [default, sfPropelNotificationPluginNotifications]
+}}}
+
+=== Using the default email backend ===
+
+The plugin comes with a default email notification backend (based on symfony's `sfMail` class).
+
+You first need to configure it for your needs :
+
+ * Copy plugin's `config/sfPropelNotificationPlugin/backends.yml` file in yout application's `config/sfPropelNotificationPlugin` directory.
+ * Configure it accordingly to your needs :
+
+{{{ 
+email:
+  enabled: on
+  class: sfPropelNotificationPluginSfMailBackend
+  params:
+    mailer: sendmail
+    charset: utf-8
+    sender_name: Notification bot
+    sender_address: noreply@example.com
+    subject_prefix: "[notification]"
+}}}
+
+You must then implement the notification emails template. Email body is provided by plugin's `sfPropelNotificationPluginBackends::SfMail` action.
+Enable it in your application's `settings.yml` :
+
+{{{
+all:
+  .settings:  
+    enabled_modules: [default, sfPropelNotificationPluginNotifications, sfPropelNotificationPluginBackends]
+}}}
+
+You must create one template per notification type :
+
+ * Create a module directory tree in your application :
+
+{{{
+modules
+|-- sfPropelNotificationPluginBackends
+  | -- templates
+}}}
+
+ * Implement needed templates :
+
+Templates names correspond to notification type name (eg. `OffensiveArticleSuccess.php`)
+The following variables are made available to template :
+
+ * `$object` : the object which triggered notification
+ * `$watch` : the watch from database. It grants access database user through its `getUser` method. 
+
+Here is an example template :
+
+{{{
+#!php
+// modules/sfPropelNotificationPluginBackends/templates/OffensiveArticleSuccess.php
+
+Hello <?php echo $watch->getUser()->getFirstName() ?>,
+
+You receive this notification email because the article <?php echo $object->getTitle() ?> (<?php echo url_to('@article_view?id='.$object->getId()) ?>)
+has been reported offensive several times.
+
+You can :
+
+ * Delete it : <?php echo url_to('@article_delete?id='.$object->getId()) ?>
+
+or
+
+ * Reset its offensiveness status : <?php echo url_to('@article_reset?id='.$object->getId()) ?>
+}}}
+
+=== Implementing a new notification backend ===
+
+It is possible to create new notification backends. Let's see how to create a (fake) XMPP notification backend.
+
+ * Specify new backend in application's `config/sfPropelNotificationPlugin/backends.yml` :
+ 
+{{{
+xmpp:
+  enabled: on
+  class: FakeXmppNotificationBackend
+  params:
+    server: jabber.example.net
+    user:   bot@jabber.example.net
+}}}
+
+ * Implement the `FakeXmppNotificationBackend` class :
+
+A few notes : 
+   * Notification backends should extend the `sfPropelNotificationPluginAbstractBackend` class.
+   * Notification backends must implement a `notify()` method.
+   * The `getParameter()` method grant access to parameters defined in the `params` section of backend's specification
+
+{{{
+#!php
+<?php
+class FakeXmppNotificationBackend extends sfPropelNotificationPluginAbstractBackend
+{
+  /**
+   * Sends a IM message to user related to given watch. This a totally fake implementation.
+   * 
+   * @param     Watch        $watch
+   * @param     BaseObject   $object
+   */
+  public function notify(Watch $watch, BaseObject $object)
+  {
+    // class initialization
+    $xmpp = new SomeXmppLib();
+    $xmpp->setServer($this->getParameter('server'));    
+    $xmpp->setUser($this->getParameter('user'));
+
+    // Make useful information available to action
+    $request = sfContext::getInstance()->getRequest();
+    $request->setParameter('watch', $watch);
+    $request->setParameter('object', $object);
+
+    // Build message body
+    $controller = sfContext::getInstance()->getController();
+    $msg_body = $controller->getPresentationFor('sfPropelNotificationPluginBackends', 'FakeXmpp');
+    $xmpp->setBody($msg_body);
+    
+    // Send the message
+    $xmpp->setDestUser($watch->getUser()->getJabberAddress());
+    $xmpp->send();
+    
+  }
+}
+}}}
+
+ * You now add a `FakeXmpp` action to plugin's `sfPropelNotificationPluginBackends` module :
+
+This action will take care of building message body depending on notification type, object that triggered notification and 
+user who will receive the notification.
+
+{{{
+#!php
+<?php
+class backendsActions extends sfPropelNotificationPluginBackendsActions
+{
+
+  public function executeFakeXmpp()
+  {
+    // We don't want a layout
+    $this->setLayout(false);
+    
+    // Make useful information available to view
+    $this->watch = $this->getRequestParameter('watch');
+    $this->object = $this->getRequestParameter('object');
+    
+    // Build template name depending on notification type
+    $this->setTemplate(sfInflector::camelize($this->watch->getWatchType()));
+  }
+
+}
+}}}
+
+== Changelog ==
+
+=== trunk ===
+
+ * removed hardcoded "User" model
+ * wrote installation docs
+ * wrote usage docs
+ * deprecated sfUser::getId() / getPeerClass() in favor of getAttribute() + plugin namespace
+
+=== 2007-03-02 | 0.1.0 alpha ===
+
+Initial public release

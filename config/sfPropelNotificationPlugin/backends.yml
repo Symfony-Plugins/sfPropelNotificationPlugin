@@ -1,0 +1,13 @@
+email:
+  enabled: on
+  class: sfPropelNotificationPluginSfMailBackend
+  params:
+    mailer: sendmail
+    charset: utf-8
+    sender_name: Michel Bertier
+    sender_address: mbertier@example.com
+    subject_prefix: "[notification]"
+    
+jabber:
+  enabled: off # "not implemented" would be more accurate :P
+  class: sfPropelNotificationPluginBlitzCafeXmppBackend

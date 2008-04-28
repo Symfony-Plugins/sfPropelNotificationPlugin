@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://pear.php.net/dtd/package-2.0"
+	xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	packagerversion="1.4.1" version="2.0"
+	xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+	<name>sfPropelNotificationPlugin</name>
+	<channel>pear.symfony-project.com</channel>
+	<summary>PropelNotifications plugin</summary>
+	<description>
+		The `sfPropelNotificationPlugin` is a lightweight,
+		resource-oriented notification framework.
+	</description>
+	<lead>
+		<name />
+		<user />
+		<email />
+		<active>yes</active>
+	</lead>
+	<date>2007-03-02</date>
+	<version>
+		<release>0.1.0</release>
+		<api>0.1.0</api>
+	</version>
+	<stability>
+		<release>alpha</release>
+		<api>alpha</api>
+	</stability>
+	<license uri="http://www.symfony-project.com/license">
+		MIT license
+	</license>
+	<notes>-</notes>
+	<contents>
+		<dir name="/">
+			<dir name="lib">
+				<dir name="model">
+					<file name="UserPeer.php" role="data" />
+					<file name="User.php" role="data" />
+					<file name="WatchPeer.php" role="data" />
+					<file name="Watch.php" role="data" />
+					<file name="WatchHasWatchNotifierPeer.php" role="data" />
+					<file name="WatchHasWatchNotifier.php" role="data" />
+				</dir>
+				<dir name="behavior">
+					<file name="sfPropelNotificationBehavior.class.php" role="data" />
+				</dir>
+				<dir name="backend">
+					<file name="sfPropelNotificationPluginAbstractBackend.php" role="data" />
+					<file name="sfPropelNotificationPluginSfMailBackend.php" role="data" />
+				</dir>
+				<dir name="util">
+					<file name="sfPropelNotificationDispatcher.class.php" role="data" />
+				</dir>
+				<dir name="config">
+					<file name="sfPropelNotificationPluginBackendsConfigurationHandler.class.php" role="data" />
+					<file name="sfPropelNotificationPluginTypesConfigurationHandler.class.php" role="data" />
+				</dir>
+			</dir>
+			<dir name="config">
+				<file name="config.php" role="data" />
+				<file name="schema.xml" role="data" />
+				<dir name="sfPropelNotificationPlugin">
+					<file name="types.yml" role="data" />
+					<file name="backends.yml" role="data" />
+				</dir>
+				<file name="config_handlers.yml" role="data" />
+			</dir>
+			<dir name="modules">
+				<dir name="sfPropelNotificationPluginBackends">
+					<dir name="actions">
+						<file name="actions.class.php" role="data" />
+					</dir>
+					<dir name="templates" />
+				</dir>
+				<dir name="sfPropelNotificationPluginNotifications">
+					<dir name="templates">
+						<file name="mySuccess.php" role="data" />
+					</dir>
+					<dir name="actions">
+						<file name="actions.class.php" role="data" />
+					</dir>
+				</dir>
+			</dir>
+			<file name="README" role="data" />
+			<file name="LICENSE" role="data" />
+		</dir>
+	</contents>
+
+	<dependencies>
+		<required>
+			<php>
+				<min>5.1.0</min>
+			</php>
+			<pearinstaller>
+				<min>1.4.1</min>
+			</pearinstaller>
+			<package>
+				<name>symfony</name>
+				<channel>pear.symfony-project.com</channel>
+				<min>0.8.1</min>
+				<max>1.1.0</max>
+				<exclude>1.1.0</exclude>
+			</package>
+		</required>
+	</dependencies>
+
+	<phprelease></phprelease>
+
+	<changelog>
+		<release>
+			<version>
+				<release>0.1.0</release>
+				<api>0.1.0</api>
+			</version>
+			<stability>
+				<release>alpha</release>
+				<api>alpha</api>
+			</stability>
+			<date>2007-03-02</date>
+			<license uri="http://www.symfony-project.com/license">
+				MIT license
+			</license>
+			<notes>Initial public release</notes>
+		</release>
+	</changelog>
+</package>
