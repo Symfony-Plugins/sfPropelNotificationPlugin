@@ -21,7 +21,8 @@ class sfPropelNotificationBehavior
 # ---- HOOKS
 
   /**
-   * This hook to keep object "novelty" once it is saved.
+   * This hook to keep object "novelty" once it is saved. It also saves object's state before saving
+   * it to enable later comparisons.
    * 
    * @param    BaseObject    $object
    */
@@ -31,6 +32,9 @@ class sfPropelNotificationBehavior
     {
       $object->setWasNew(true);
     }
+  
+    // Save object state prior to saving
+    $object->setBeforeSave($object);
   }
   
   /**
@@ -94,6 +98,27 @@ class sfPropelNotificationBehavior
   public function setWasNew(BaseObject $object, $new)
   {
     $object->was_new = (bool)$new;
+  }
+
+  /**
+   * Saves object instance into "before_save" property. It can be called later (in notification
+   * logic provider for instance) with getBeforeSave(). Useful for before / after comparisons.
+   * 
+   * @param    BaseObject    $object
+   */
+  public function setBeforeSave(BaseObject $object)
+  {
+    $object->before_save = $object;
+  }
+
+  /**
+   * Returns object instance as it was when the preSave() hook was called.
+   * 
+   * @return    BaseObject    $object
+   */
+  public function getBeforeSave()
+  {
+    return $this->before_save;
   }
 
 }

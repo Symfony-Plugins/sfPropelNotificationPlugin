@@ -45,9 +45,14 @@ For instance, when logging user in :
 {{{
 #!php
 <?php
-$this->getUser()->setAttribute('uid', $id, 'sfPropelNotificationPlugin');
-$this->getUser()->setAttribute('peer_class', 'UserPeer', 'sfPropelNotificationPlugin');
+$user->setAttribute('uid', $id, 'sfPropelNotificationPlugin');
+$user->setAttribute('peer_class', 'UserPeer', 'sfPropelNotificationPlugin');
 }}}
+
+=== Update model ===
+
+ * Enable behaviors in project's `propel.ini`
+ * Rebuild model : `propel-build-all`
 
 == Usage ==
 
@@ -267,6 +272,12 @@ class backendsActions extends sfPropelNotificationPluginBackendsActions
 
 === trunk ===
 
+==== 2008-04-28 ====
+ * added setBeforeSave() and getBeforeSave() methods to public API
+ * changed svn repository layout in order to enabled branched development
+ * fixed some documentation quirks
+
+==== Sometime before ====
  * removed hardcoded "User" model
  * wrote installation docs
  * wrote usage docs

@@ -18,4 +18,6 @@ sfPropelBehavior::registerMethods('sfPropelNotificationPlugin', array(
   'wasNew'            => array('sfPropelNotificationBehavior', 'wasNew'),
   'setWasNew'         => array('sfPropelNotificationBehavior', 'setWasNew'),
   'getWasNew'         => array('sfPropelNotificationBehavior', 'getWasNew'),
+  'setBeforeSave'     => array('sfPropelNotificationBehavior', 'setBeforeSave'),
+  'getBeforeSave'     => array('sfPropelNotificationBehavior', 'getBeforeSave'),
 ));

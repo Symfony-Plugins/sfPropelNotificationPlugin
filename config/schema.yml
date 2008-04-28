@@ -1,0 +1,15 @@
+propel:
+  _attributes:        { package: plugins.sfPropelNotificationPlugin.lib.model }
+
+  sf_watch:
+    _attributes:      { phpName: Watch, package: plugins.sfPropelNotificationPlugin.lib.model }
+    id:               { type: integer, required: true, primaryKey: true, autoincrement: true }
+    user_id:          { type: integer, required: true, foreignTable: member, foreignReference: id, onDelete: CASCADE }
+    watch_type:       { type: varchar, size: 255, required: true }
+
+  sf_watch_has_watch_notifier:
+    _attributes:      { phpName: WatchHasWatchNotifier, package: plugins.sfPropelNotificationPlugin.lib.model }
+    watch_id:         { type: integer, required: true, foreignTable: sf_watch, foreignReference: id }
+    watch_notifier:   { type: varchar, size: 255, required: true }
+
+
