@@ -272,6 +272,9 @@ class backendsActions extends sfPropelNotificationPluginBackendsActions
 
 === trunk ===
 
+==== 2008-04-29 ====
+ * Notification logic methods are now passed the watch instance as second parameter
+
 ==== 2008-04-28 ====
  * added setBeforeSave() and getBeforeSave() methods to public API
  * changed svn repository layout in order to enabled branched development

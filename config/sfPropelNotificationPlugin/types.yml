@@ -1,3 +1,3 @@
 example_type:
-  enabled: on
+  enabled: off
   logic_class: ExampleLogicProvider

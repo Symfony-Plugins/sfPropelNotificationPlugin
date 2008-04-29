@@ -34,7 +34,7 @@ class sfPropelNotificationDispatcher
     $watches = WatchPeer::doSelect($c);
     foreach ($watches as $watch)
     {
-      if (self::isWorthNotifying($object, $watch_type))
+      if (self::isWorthNotifying($object, $watch))
       {      
         foreach ($watch->getNotifiers() as $notifier)
         {
@@ -73,22 +73,22 @@ class sfPropelNotificationDispatcher
    * Tells object recent modification should trigger notification for requested type.
    * 
    * @param       BaseObject     $object
-   * @param       string         $watch_type
+   * @param       BaseObject     $watch
    * @return      bool
    */
-  private static function isWorthNotifying(BaseObject $object, $watch_type)
+  private static function isWorthNotifying(BaseObject $object, BaseObject $watch)
   {
     include(sfConfigCache::getInstance()->checkConfig('config/sfPropelNotificationPlugin/types.yml'));
     $types = sfConfig::get('sfPropelNotificationPlugin_types');
 
-    if (!isset($types[$watch_type]))
+    if (!isset($types[$watch->getWatchType()]))
     {
-      $msg = sprintf('Unknown notification type "%s"', $watch_type);
+      $msg = sprintf('Unknown notification type "%s"', $watch->getWatchType());
       throw new Exception($msg);
     }
     
     return call_user_func(array($types[$watch_type]['logic_class'], 
-                                sfInflector::camelize($watch_type)), $object);
+                                sfInflector::camelize($watch->getWatchType())), $object, $watch);
   }
 
 }
