@@ -1,20 +1,20 @@
 <?php
 /*
  * This file is part of the sfPropelNotificationPlugin package.
- * 
+ *
  * (c) 2006-2007 Tristan Rivoallan <tristan@rivoallan.net>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
  * This class holds the `dispatch` method, backbone of the notification system.
- * 
+ *
  * @package     sfPropelNotificationPlugin
  * @subpackage  util
  * @author      Tristan Rivoallan <tristan@rivoallan.net>
- * 
+ *
  * @see         http://www.symfony-project.com/book/trunk/19-Mastering-Symfony-s-Configuration-Files
  */
 class sfPropelNotificationDispatcher
@@ -23,7 +23,7 @@ class sfPropelNotificationDispatcher
   /**
    * Gets all subscriptions for requested watch_type, finds out if notification should be triggered,
    * then runs notification using whatever backends subscribing users configured.
-   * 
+   *
    * @param    string       $watch_type
    * @param    BaseObject   $object
    */
@@ -35,7 +35,7 @@ class sfPropelNotificationDispatcher
     foreach ($watches as $watch)
     {
       if (self::isWorthNotifying($object, $watch))
-      {      
+      {
         foreach ($watch->getNotifiers() as $notifier)
         {
           $backend = self::getNotificationBackendInstance($notifier);
@@ -47,7 +47,7 @@ class sfPropelNotificationDispatcher
 
   /**
    * Returns a configured backend instance, ready to launch notification.
-   * 
+   *
    * @param     string     $notifier
    * @return    sfPropelNotificationPluginAbstractBackend
    */
@@ -61,17 +61,17 @@ class sfPropelNotificationDispatcher
       $msg = sprintf('Unknown notification backend "%s"', $notifier);
       throw new Exception($msg);
     }
-    
+
     $class = $backends[$notifier]['class'];
     $instance = new $class();
     $instance->configure($backends[$notifier]['params']);
-    
+
     return $instance;
   }
 
   /**
    * Tells object recent modification should trigger notification for requested type.
-   * 
+   *
    * @param       BaseObject     $object
    * @param       BaseObject     $watch
    * @return      bool
@@ -86,8 +86,8 @@ class sfPropelNotificationDispatcher
       $msg = sprintf('Unknown notification type "%s"', $watch->getWatchType());
       throw new Exception($msg);
     }
-    
-    return call_user_func(array($types[$watch_type]['logic_class'], 
+
+    return call_user_func(array($types[$watch->getWatchType()]['logic_class'],
                                 sfInflector::camelize($watch->getWatchType())), $object, $watch);
   }
 
